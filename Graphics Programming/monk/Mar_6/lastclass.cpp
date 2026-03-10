@@ -1,0 +1,140 @@
+#include <SFML/Graphics.hpp>
+#include <cstdlib>
+#include <ctime>
+
+using namespace sf;
+
+int main()
+{
+    srand(time(0));
+
+    // ---------------- SCREEN ----------------
+    Vector2f resolution;
+    resolution.x = VideoMode::getDesktopMode().width;
+    resolution.y = VideoMode::getDesktopMode().height;
+
+    VideoMode vm(resolution.x, resolution.y);
+    RenderWindow window(vm, "Timber Window");
+
+    // ---------------- BACKGROUND ----------------
+    Texture backgroundTexture;
+    backgroundTexture.loadFromFile("graphics/background.png");
+
+    Sprite backgroundSprite;
+    backgroundSprite.setTexture(backgroundTexture);
+    backgroundSprite.setPosition(0, 0);
+
+    // ---------------- TREE ----------------
+    Texture treeTexture;
+    treeTexture.loadFromFile("graphics/tree.png");
+
+    Sprite treeSprite;
+    treeSprite.setTexture(treeTexture);
+    treeSprite.setPosition(resolution.x / 2.0f - 150, 0);
+
+    // ---------------- CLOUDS ----------------
+    Texture cloudTexture;
+    cloudTexture.loadFromFile("graphics/cloud.png");
+
+    Sprite cloud1, cloud2, cloud3;
+    cloud1.setTexture(cloudTexture);
+    cloud2.setTexture(cloudTexture);
+    cloud3.setTexture(cloudTexture);
+
+    cloud1.setPosition(100, 50);
+    cloud2.setPosition(600, 100);
+    cloud3.setPosition(1200, 70);
+
+    // ---------------- BEES ----------------
+    Texture beeTexture;
+    beeTexture.loadFromFile("graphics/bee.png");
+
+    const int beeCount = 4;
+
+    Sprite bees[beeCount];
+    float beeSpeed[beeCount];
+
+    for (int i = 0; i < beeCount; i++)
+    {
+        bees[i].setTexture(beeTexture);
+
+        float startX = resolution.x + rand() % 500;
+        float startY = 200 + rand() % 500;
+
+        bees[i].setPosition(startX, startY);
+
+        // Speed in pixels per second
+        beeSpeed[i] = 100.0f + rand() % 200;
+    }
+
+    // ---------------- PAUSE CONTROL ----------------
+    bool isPaused = false;
+
+    // Clock for smooth movement
+    Clock clock;
+
+    // ---------------- GAME LOOP ----------------
+    while (window.isOpen())
+    {
+        Event event;
+        while (window.pollEvent(event))
+        {
+            if (event.type == Event::Closed)
+                window.close();
+
+            // Toggle pause when Enter is pressed
+            if (event.type == Event::KeyPressed &&
+                event.key.code == Keyboard::Enter)
+            {
+                isPaused = !isPaused;
+            }
+        }
+
+        if (Keyboard::isKeyPressed(Keyboard::Escape))
+            window.close();
+
+        float deltaTime = clock.restart().asSeconds();
+
+        // ----------- BEE MOVEMENT -----------
+        if (!isPaused)
+        {
+            for (int i = 0; i < beeCount; i++)
+            {
+                Vector2f pos = bees[i].getPosition();
+
+                // Move straight left
+                pos.x -= beeSpeed[i] * deltaTime;
+
+                bees[i].setPosition(pos);
+
+                // Reset when off screen
+                if (pos.x < -100)
+                {
+                    float newX = resolution.x + rand() % 500;
+                    float newY = 200 + rand() % 500;
+
+                    bees[i].setPosition(newX, newY);
+                    beeSpeed[i] = 100.0f + rand() % 200;
+                }
+            }
+        }
+
+        // ---------------- DRAW ----------------
+        window.clear();
+
+        window.draw(backgroundSprite);
+        window.draw(cloud1);
+        window.draw(cloud2);
+        window.draw(cloud3);
+        window.draw(treeSprite);
+        // window.draw(bees);
+        for (int i = 0; i < 1; i++)
+        {
+            window.draw(bees[i]);
+        }
+
+        window.display();
+    }
+
+    return 0;
+}
