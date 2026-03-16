@@ -43,7 +43,7 @@ int main()
     playerTexture.loadFromFile("graphics/player.png");
     Sprite playerSprite;
     playerSprite.setTexture(playerTexture);
-    playerSprite.setPosition(1000, res.y - 330);
+    playerSprite.setPosition(500, res.y - 330);
 
     // 5. Bees
     Texture beeTexture;
@@ -311,7 +311,7 @@ int main()
         {
             rm.draw(messageText);
         }
-        // rm.draw(playerSprite);
+        rm.draw(playerSprite);
         rm.display();
     }
     return 0;
